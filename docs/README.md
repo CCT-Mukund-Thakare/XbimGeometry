@@ -45,21 +45,6 @@
 9. Build the XbimGeometry and XbimEssentials Solutions and generate new packages
 10. Install the newly generated packages into another project to use the new functionality.- [Xbim Geometry Exploration](#xbim-geometry-exploration)
 
-- [Xbim Geometry Exploration](#xbim-geometry-exploration)
-  - [Case Study IXbimGeometryEngine Interface](#case-study-ixbimgeometryengine-interface)
-    - [How the IXbimGeometryEngine Interface is defined](#how-the-ixbimgeometryengine-interface-is-defined)
-    - [How XbimGeometryEngine calls the Native C++ Code](#how-xbimgeometryengine-calls-the-native-c-code)
-    - [How We Have Added a Custom Functionality to Extract Edges](#how-we-have-added-a-custom-functionality-to-extract-edges)
-  - [Adding New Classes to Xbim.Geometry.Engine Project](#adding-new-classes-to-xbimgeometryengine-project)
-  - [Building XbimEssentials Project](#building-xbimessentials-project)
-  - [Packaging the XbimEssentials Project](#packaging-the-xbimessentials-project)
-  - [Building XbimGeometry Project](#building-xbimgeometry-project)
-  - [Packaging XbimGeometry Project](#packaging-xbimgeometry-project)
-  - [Testing, Debugging, and Profiling Geometry Engine Projects](#testing-debugging-and-profiling-geometry-engine-projects)
-  - [Using the Generated Packages in Another Project](#using-the-generated-packages-in-another-project)
-  - [Risks](#risks)
-  - [Additional Resources and References](#additional-resources-and-references)
-
 ### Adding New Classes to Xbim.Geometry.Engine Project
 
 1. Right-click on the Xbim.Geometry.Engine Project in Visual Studio
@@ -120,7 +105,7 @@
 ### Risks
 
 1. Difficult to Maintain the Custom Packages
-2. Need to Push the Packages on some remote source to reduce a few steps while building the projects.
+2. Need to Push the Packages on some remote sources to reduce a few steps while building the projects.
 3. The Current Solution is based on XbimGeometry 5.1.437 and XbimEssentials 5.1.341 which no longer contain the latest changes. These Projects have been migrated to netcore version 6.0
 
 ### Additional Resources and References
