@@ -60,11 +60,21 @@
 6. Xbim.Geometry.Engine uses OCCT to generate Geometry Model and Triangulation.
 7. In the case of simple shape representation types like IfcFacetedBrep the tesselation is computed by Xbim.Tesselator module.
 
+| Shape Representation       | Module Used          |
+| -------------------------- | -------------------- |
+| IfcFacetedBrep             | Xbim.Tesselator      |
+| IIfcFaceBasedSurfaceModel  | Xbim.Tesselator      |
+| IIfcShellBasedSurfaceModel | Xbim.Tesselator      |
+| IIfcConnectedFaceSet       | Xbim.Tesselator      |
+| IIfcTessellatedFaceSet     | Xbim.Tesselator      |
+| IfcExtrudedArea            | Xbim.Geometry.Engine |
+| All Other                  | Xbim.Geometry.Engine |
+
 #### Geometry and Triangulation Computation Case Study for a Simple Wall (IfcExtrudedAreaSolid)
 
 1. Load the Model using Xbim SDK, and create an instance of Xbim.ModelGeometry.Scene class using the model and call the `CreateContext()` method.
 2. Inside `CreateContext()` method, first the Shape is queried using ShapeId and stored as IIfcGeometricRepresentationItem
-3. Using this Shape of type IIfcGeometricRepresentationItem we check if its triangulation can be computed using Xbim.Tesselator method using `Xbim.Tesselator.CanMesh()`  method. 
+3. Using this Shape of type IIfcGeometricRepresentationItem we check if its triangulation can be computed using Xbim.Tesselator method using `Xbim.Tesselator.CanMesh()`  method.
 4. In this case, since the type of IIfcGeometricReprsentationItem is of type IfcExtrudedArea it cannot be computed using Xbim.Tesselator module.
 5. Next, we use Xbim.Geometry.Engine module to generate a Geometry Model for the ShapeRepresentation IfcExtrudedArea.
 6. For ShapeRepresentation of type IfcExtrudedArea, to create a geometry model we need a Base Shape and a Direction.
