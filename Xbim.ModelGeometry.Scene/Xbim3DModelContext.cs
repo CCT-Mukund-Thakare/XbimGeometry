@@ -14,6 +14,7 @@ using Xbim.Common;
 using Xbim.Common.Exceptions;
 using Xbim.Common.Geometry;
 using Xbim.Geometry.Engine.Interop;
+using Xbim.Ifc4;
 using Xbim.Ifc4.Interfaces;
 using Xbim.ModelGeometry.Scene.Clustering;
 using Xbim.ModelGeometry.Scene.Extensions;
@@ -155,6 +156,7 @@ namespace Xbim.ModelGeometry.Scene
         {
             public XbimRect3D BoundingBox;
             public int GeometryId;
+            public int EdgeId;
             public int StyleLabel;
             public XbimVector3D? LocalShapeDisplacement;
         }
@@ -951,6 +953,7 @@ namespace Xbim.ModelGeometry.Scene
                         {
                             using (var bw = new BinaryWriter(memStream))
                             {
+                               
                                 Engine.WriteTriangulation(bw, geom, mf.Precision,
                                     thisDeflectionDistance, thisDeflectionAngle);
                             }
@@ -1320,6 +1323,7 @@ namespace Xbim.ModelGeometry.Scene
                         {
                             BoundingBox = (shapeGeom).BoundingBox,
                             GeometryId = geometryStore.AddShapeGeometry(shapeGeom),
+                           
                             // if shape had large coordinates these might be reduced. This represents the
                             // local displacement of the shape. It needs to be applied to shape (and bounding box) placement in the product.
                             LocalShapeDisplacement = shapeGeom.LocalShapeDisplacement
@@ -1367,16 +1371,19 @@ namespace Xbim.ModelGeometry.Scene
 
                     // Console.WriteLine(shape.GetType().Name);
                     XbimShapeGeometry shapeGeom = null;
+                    IXbimSolid xSolid = null;
                     IXbimGeometryObject geomModel = null;
                     if (!isFeatureElementShape && !isVoidedProductShape && xbimTessellator.CanMesh(shape)) // if we can mesh the shape directly just do it
                     {
                         shapeGeom = xbimTessellator.Mesh(shape);
+                       
                     }
                     else //we need to create a geometry object
                     {
                         try
                         {
                             geomModel = Engine.Create(shape, _logger);
+                           
                         }
                         catch (XbimGeometryFaceSetTooLargeException fse)
                         {
@@ -1389,8 +1396,14 @@ namespace Xbim.ModelGeometry.Scene
                         }
                         if (geomModel != null && geomModel.IsValid)
                         {
+                            if(!geomModel.IsSet)
+                            {
+                                xSolid = geomModel as IXbimSolid;
+                            }    
 
                             shapeGeom = Engine.CreateShapeGeometry(geomModel, precision, deflection, deflectionAngle, geomStorageType, _logger);
+                           
+
                             if (isFeatureElementShape)
                             {
                                 var geomSet = geomModel as IXbimGeometryObjectSet;
@@ -1413,10 +1426,13 @@ namespace Xbim.ModelGeometry.Scene
                     else
                     {
                         shapeGeom.IfcShapeLabel = shapeId;
+                        var geomId =  geometryStore.AddShapeGeometry(shapeGeom);
+                       
                         var reference = new GeometryReference
                         {
                             BoundingBox = shapeGeom.BoundingBox,
-                            GeometryId = geometryStore.AddShapeGeometry(shapeGeom),
+                            GeometryId = geomId,
+                            EdgeId = xSolid != null ?  geometryStore.AddEdgeGeometry(Model.Instances[shapeId].EntityLabel, xSolid.Edges) : -1,
                             // if shape had large coordinates these might be reduced. This represents the
                             // local displacement of the shape. It needs to be applied to shape (and bounding box) placement in the product.
                             // This is often the case for already triangulated geometry from infrastructure tools like Bentley.
@@ -1432,6 +1448,7 @@ namespace Xbim.ModelGeometry.Scene
                             //keep a record of the IFC label and database record mapping
                             contextHelper.GeometryShapeLookup.TryAdd(shapeGeom.ShapeLabel, shapeGeom.IfcShapeLabel);
                         }
+                     
 
                         //   shapeGeometries.Add(shapeGeom);
                     }
